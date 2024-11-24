@@ -1,0 +1,21 @@
+int partition(int* arr,int l,int r){
+    int X=arr[rand()%(r+1-l)+l];
+    int i=l-1, j=r+1;
+    while(true){
+        do{
+            i++;
+        }while(arr[i]<X);
+        do{
+            j--;
+        }while(arr[j]>X);
+        if(i>=j) return j;
+        swap(arr[i], arr[j]);
+    }
+}
+void (int* arr,int l,int r){
+    if(l<r){
+    int q=partition(arr,l,r);
+        quickSort(arr,l,q);
+        quickSort(arr,q+1,r);
+    }
+}
