@@ -1,1 +1,240 @@
+#include <bits/stdc++.h>
+using namespace std;
+class Node{
+    public:
+        int key;
+        int d;
+        Node* left;
+        Node* right;
+        int fb;
+    public:
+        static Node* montanode(int k,int T){
+            Node *p = new Node;
+            if(p){
+                p->key = k;
+                p->d = T;
+                p->left = nullptr;
+                p->right = nullptr;
+                p->fb = 0;
+            }
+            return p;
+        }
+        static void desmontanode(Node *p){
+            delete p;
+        }
+};
+class AVLtree{
+    private:
+        Node* Root;
+        void AVLprintPos(Node * r){
+            if(r){
+                AVLprintPos(r->left);
+                AVLprintPos(r->right);
+                cout<<" "<<r->key;
+            }
+        }
+        void AVLprintPre(Node * r){
+            if(r){
+                cout<<" "<<r->key;
+                AVLprintPre(r->left);
+                AVLprintPre(r->right);
+            }
+        }
+        void AVLprintInf(Node * r){
+            if(r){
+                AVLprintInf(r->left);
+                cout<<" "<<r->key;
+                AVLprintInf(r->right);
+            }
+        }
+        void AVLprintNivel(Node * r){
+            
+        }
+        static Node* Min(Node*r){
+            if(!r->left)
+                return r;
+            return Min(r->left);
+        }
+        void AVL_RSD(Node **r){
 
+        }
+        void AVL_RSE(Node **r){
+            
+        }
+        void AVL_RDD(Node **r){
+            
+        }
+        void AVL_RDE(Node **r){
+            Node *a = *r;
+            Node *b = a->right;
+            Node *c = b->left;
+            a->right = c->left;
+            b->left = c->right;
+            c->left = a;
+            c->right = b;
+            if(c->fb==-1){
+                a->fb = 0;
+                b->fb = 1;
+            }else{
+                if(c->fb==-1){
+                    a->fb = -1;
+                    b->fb = 0;
+                }
+            }
+            c->fb = 0;
+            *r = c;
+        }
+    public:
+        AVLtree(){
+           Root = nullptr;
+        }
+        bool AVLinsert(int k,int d){
+            Node *p = Node::montanode(k,d);
+            if(!p)
+                return false;
+            Node** r = &Root;
+            while((*r)){
+                if(p->key<(*r)->key)r = &((*r)->left);
+                else r = &((*r)->right);
+            }
+            (*r) = p;
+            return true;
+        }
+        bool Erase(int k, Node **r){
+            if(!(*r))
+                return false;
+            if(k==(*r)->key){
+                if(!(*r)->left){
+                    Node*p=(*r);
+                    *r=(*r)->right;
+                    delete p;
+                    return true;
+                }
+                if(!(*r)->right){
+                    Node*p=(*r);
+                    *r=(*r)->left;
+                    delete p;
+                    return true;
+                }
+                Node*p=Min((*r)->right);
+                swap((*r)->key, p->key);
+                swap((*r)->d, p->d);
+                if(Erase(k, &((*r)->right))){
+                    if((*r)->fb == 1){
+                        (*r)->fb = 0;
+                        return true;
+                    }
+                    if((*r)->fb == 0){
+                        (*r)->fb = -1;
+                        return false;
+                    }
+                    if((*r)->left->fb==-1){
+                       AVL_RSD(r); 
+                       return true;
+                    }
+                    if((*r)->left->fb==0){
+                       AVL_RSD(r); 
+                       return false;
+                    }
+                    AVL_RDD(r);
+                    return true;
+                }
+                return false;
+            }
+            if(k<(*r)->key){
+                if(Erase(k, &((*r)->left))){
+                    if((*r)->fb == -1){
+                        (*r)->fb = 0;
+                        return true;
+                    }
+                    if((*r)->fb == 0){
+                        (*r)->fb = 1;
+                        return false;
+                    }
+                    if((*r)->right->fb==1){
+                       AVL_RSE(r); 
+                       return true;
+                    }
+                    if((*r)->right->fb==0){
+                       AVL_RSE(r); 
+                       return false;
+                    }
+                    AVL_RDE(r);
+                    return true;
+                }
+                return false;
+            }
+            if(Erase(k, &((*r)->right))){
+                if((*r)->fb == 1){
+                    (*r)->fb = 0;
+                    return true;
+                }
+                if((*r)->fb == 0){
+                    (*r)->fb = -1;
+                    return false;
+                }
+                if((*r)->left->fb==-1){
+                    AVL_RSD(r); 
+                    return true;
+                }
+                if((*r)->left->fb==0){
+                    AVL_RSD(r); 
+                    return false;
+                }
+                AVL_RDD(r);
+                return true;
+            }
+            return false;
+        }
+        int AVLfind(int k){
+            Node * r = Root;
+            while(r and k!=r->key){
+                if(k<r->key)r=r->left;
+                else r=r->right;
+            }
+            if(r){
+                return r->d;
+            }
+            return r->d;
+        }
+        void InOrder(){
+            Node * r = Root;
+            AVLprintInf(r);
+        }
+        void PosOrder(){
+            Node * r = Root;
+            AVLprintPos(r);
+        }
+        void PreOrder(){
+            Node * r = Root;
+            AVLprintPre(r);
+        }
+        void Nivel(){
+            Node * r = Root;
+            AVLprintNivel(r);
+        }
+};
+signed main()
+{
+	int qq;
+    cin>>qq;
+    for(int i=1;i<=qq;i++){
+        cout<<"Case "<<i<<":\n";
+        int n;
+        cin>>n;
+        AVLtree arv;
+        while(n--){
+            int x;cin>>x;
+            arv.AVLinsert(x,x);
+        }
+    	cout<<"Pre.:";
+        arv.PreOrder();
+    	cout<<"\nIn..:";
+        arv.InOrder();
+    	cout<<"\nPost:";
+        arv.PosOrder();
+        cout<<endl<<endl;
+        arv.Nivel();
+        cout<<endl;
+    }
+}
