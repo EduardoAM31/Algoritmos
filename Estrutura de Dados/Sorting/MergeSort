@@ -1,0 +1,18 @@
+void Merge(int *V, int i, int m, int f){
+    int T = f-i+1, x, y, z;
+    int A[T];
+    for(x = i, y = m+1, z = 0; x <= m && y <= f; z++)
+        if(V[x] < V[y])A[z] = V[x++];
+        else A[z] = V[y++];
+    for(; x <= m; x++, z++)A[z] = V[x]; 
+    for(; y <= f; y++, z++)A[z] = V[y]; 
+    for(x = 0; x < T; x++)V[i+x] = A[x]; 
+}
+void mergeSort(int *V, int i, int f){
+    if(i < f){
+        int m = (i+f)/2;
+        mergeSort(V, i, m);
+        mergeSort(V, m+1, f);
+        Merge(V, i, m, f);
+    }
+}
