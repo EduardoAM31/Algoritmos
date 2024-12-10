@@ -47,11 +47,6 @@ class AVLtree{
                 AVLprintInf(r->right);
             }
         }
-		/*
-              1
-      1               1
-  1       1       1       1      
-1   1   1   1   1   1   1   1        */ 
         void AVLprintNivel(Node *r, int niveltotal){
             queue<Node*> q;
 			q.push(r);
@@ -64,7 +59,7 @@ class AVLtree{
 					nivelatual++;
 					niveltotal--;
 				}
-				if(q.front()->d==-1)cout<<"F";
+				if(q.front()->d==-1)cout<<" ";
 				else cout<<q.front()->key;
 				if(!(q.front()->left)){
 					if(q.front()->d != -1){
@@ -105,7 +100,7 @@ class AVLtree{
                 return r;
             return Min(r->left);
         }
-		void AVL_RSE(Node **r){
+		static void AVL_RSE(Node **r){
             Node*a=*r;
             Node*b=a->right;
             a->right=b->left;
@@ -117,7 +112,7 @@ class AVLtree{
             else a->fb=b->fb=0;
             *r=b;
         }
-        void AVL_RSD(Node **r){
+        static void AVL_RSD(Node **r){
             Node*a=*r;
             Node*b=a->left;
             a->left=b->right;
@@ -128,7 +123,7 @@ class AVLtree{
             }else a->fb=b->fb=0;
             *r=b;
         }
-        void AVL_RDE(Node **r){
+        static void AVL_RDE(Node **r){
             Node*a=*r;
             Node*b=a->right;
             Node*c=b->left;
@@ -149,7 +144,7 @@ class AVLtree{
             c->fb=0;
             *r=c;
         }
-        void AVL_RDD(Node **r){
+        static void AVL_RDD(Node **r){
             Node*a=*r;
             Node*b=a->left;
             Node*c=b->right;
@@ -174,21 +169,50 @@ class AVLtree{
 			if(!r)return 0;
 			return max(get_Altura(r->left),get_Altura(r->right))+1;
 		}
-    public:
-        AVLtree(){
-           Root = nullptr;
-        }
-        bool AVLinsert(int k,int d){
-            Node *p = Node::montanode(k,d);
-            if(!p)
-                return false;
-            Node** r = &Root;
-            while((*r)){
-                if(p->key<(*r)->key)r = &((*r)->left);
-                else r = &((*r)->right);
+        static bool AVLinsert(Node **r, int k,Node *p){
+            if(!(*r)){
+                *r = p;
+                p->fb = 0;
+                return true;
             }
-            (*r) = p;
-            return true;
+            if(k < (*r) -> key){
+                if(AVLinsert(&(*r)->left, k, p)){
+                    if((*r)->fb==0){
+                        (*r)->fb=-1;
+                        return true;
+                    }
+                    if((*r)->fb==1){
+                        (*r)->fb=0;
+                        return false;
+                    }
+                    if(((*r)->left)->fb==-1){
+                        AVL_RSD(r);
+                        return false;
+                    }
+                    AVL_RDD(r);
+                    return false;
+                }
+                return false;
+            }
+            if(k > (*r) -> key){
+                if(AVLinsert(&(*r)->right, k, p)){
+                    if((*r)->fb==0){
+                        (*r)->fb=1;
+                        return true;
+                    }
+                    if((*r)->fb==-1){
+                        (*r)->fb=0;
+                        return false;
+                    }
+                    if(((*r)->right)->fb==+1){
+                        AVL_RSE(r);
+                        return false;
+                    }
+                    AVL_RDE(r);
+                    return false;
+                }
+                return false;
+            }
         }
         bool Erase(int k, Node **r){
             if(!(*r))
@@ -276,6 +300,17 @@ class AVLtree{
             }
             return false;
         }
+    public:
+        AVLtree(){
+           Root = nullptr;
+        }
+        void insert(int k,int d){
+            Node *p = Node::montanode(k,d);
+            if(p)AVLinsert(&Root, k, p);
+        }
+        void erase(int k){
+            Erase(k, &Root);
+        }
         int AVLfind(int k){
             Node * r = Root;
             while(r and k!=r->key){
@@ -307,26 +342,21 @@ class AVLtree{
 };
 signed main()
 {
-	int qq;
-    cin>>qq;
-    for(int i=1;i<=qq;i++){
-        cout<<"Case "<<i<<":\n";
-        int n;
-        cin>>n;
-        AVLtree arv;
-        while(n--){
-            int x;cin>>x;
-            arv.AVLinsert(x,x);
-        }
-    	cout<<"Pre.:";
-        arv.PreOrder();
-    	cout<<"\nIn..:";
-        arv.InOrder();
-    	cout<<"\nPost:";
-        arv.PosOrder();
-    	cout<<"\nNivel:";
-        cout<<endl<<endl;
-        arv.Nivel();
-        cout<<endl;
+    int n;
+    cin>>n;
+    AVLtree arv;
+    while(n--){
+        int x;cin>>x;
+        arv.insert(x,x);
     }
+    cout<<"Pre.:";
+    arv.PreOrder();
+    cout<<"\nIn..:";
+    arv.InOrder();
+    cout<<"\nPost:";
+    arv.PosOrder();
+    cout<<"\nNivel:";
+    cout<<endl<<endl;
+    arv.Nivel();
+    cout<<endl;
 }
