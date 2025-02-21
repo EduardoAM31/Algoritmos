@@ -3,17 +3,19 @@ using namespace std;
 struct Graph{
     int vertex, edges;
     vector<vector<int>> graph;
+    vector<pair<int,int>> graph_edge;
     void build(int n,int m){
         vertex = n;
         edges = m;
-        graph = vector<vector<int>>(n);
+        graph.resize(n);
     }
     void entrar(int u,int v){
         graph[u].push_back(v);
         graph[v].push_back(u);
+        graph_edge.push_back({u, v});
     }
-    void imprimir(){
-        cout<<"Conexoes do grafo:\n";
+    void imprimir_adjacencia(){
+        cout<<"Conexoes do grafo em lista de adjacencia:\n";
         for(int i=0;i<vertex;i++){
             cout<<i+1<<" : ";
             for(auto j : graph[i]){
@@ -22,23 +24,99 @@ struct Graph{
             cout<<endl;
         }
     }
+    void imprimir_matriz(){
+        cout<<"\nConexoes do grafo em matriz:\n";
+        int matriz_aux[vertex][vertex];
+        memset(matriz_aux, 0, sizeof(matriz_aux));
+        cout<<"  ";
+        for(int i=0;i<vertex;i++)
+            cout<<i+1<<" ";
+        cout<<endl;
+        for(int i=0;i<vertex;i++){
+            for(int j=0;j<graph[i].size();j++){
+                int j_graph = graph[i][j];
+                matriz_aux[i][j_graph]++;
+            }
+        }
+        for(int i=0;i<vertex;i++){
+            cout<<i+1<<" ";
+            for(int j=0;j<vertex;j++)
+                cout<<matriz_aux[i][j]<<" \n"[j==vertex-1];
+        }
+    }
+    void imprimir_matriz_incidencia(){
+        cout<<"\nConexoes do grafo em matriz de incidencia:\n";
+        int matriz_aux[vertex][edges];
+        memset(matriz_aux, 0, sizeof(matriz_aux));
+        for(int i=0;i<edges;i++){
+            int u = graph_edge[i].first;
+            int v = graph_edge[i].second;
+            matriz_aux[u][i]=1;
+            matriz_aux[v][i]=1;
+        }
+        cout<<"  ";
+        for(int i=0;i<edges;i++)
+            cout<<i+1<<" ";
+        cout<<endl;
+        for(int i=0;i<vertex;i++){
+            cout<<i+1<<" ";
+            for(int j=0;j<edges;j++)
+                cout<<matriz_aux[i][j]<<" \n"[j==edges-1];
+        }
+    }
+    
     void somatorio_vertices(){
-        cout<<"Graus do vertice do grafo:\n";
+        cout<<"\nGraus do vertice do grafo:\n";
         for(int i=0;i<vertex;i++){
             cout<<"Grau ("<<i+1<<") : "<<graph[i].size()<<endl;
         }
     } 
-    string invariantes_iso(Graph graph2){
+    void invariantes_iso(Graph graph2){
         int vertex1 = graph.size();
         int vertex2 = graph2.graph.size();
         if(vertex1 != vertex2)
-            return "Nao sao isomorfos\n";
+            cout<<"\nNao sao isomorfos\n";
         for(int i=0;i<vertex1;i++){
             if(graph[i].size() != graph2.graph[i].size())
-                return "Nao sao isomorfos\n";
+                cout<<"\nNao sao isomorfos\n";
         }
-        return "Nao e possivel responder\n";
+        cout<<"\nNao e possivel responder\n";
     }
+    void classificao(){
+        cout<<"\nClassificao do grafo:\n";
+        //Grafo completo
+        bool verificacao=1;
+        for(int i=0;i<vertex;i++){
+            if(graph[i].size() != vertex-1)verificacao=0;
+        }
+        if(verificacao){
+            cout<<"Grafo Completo\n";
+        }
+        //Grafo ciclo
+        verificacao = 1;
+        for(int i=0;i<vertex;i++){
+            if(graph[i].size() != 2)verificacao=0;
+        }
+        if(verificacao){
+            cout<<"Grafo Ciclo\n";
+        }
+        int borda=0,centro=0;
+        for(int i=0;i<vertex;i++){
+            if(graph[i].size() == 3)borda++;
+            else if(graph[i].size() == vertex-1)centro++;
+        }
+        if(centro == 1 && borda == vertex-1){
+            cout<<"Grafo Roda\n";
+        }
+        verificacao = 1;
+        for(int i=0;i<vertex;i++){
+            if(graph[i].size()&1)verificacao=0;
+        }
+        if(verificacao){
+            cout<<"Grafo Euleriano\n";
+        }
+    }
+    
 };
 int main()
 {
@@ -49,17 +127,22 @@ int main()
     for(int j=0;j<edge;j++){
         int u,v;
         cin>>u>>v;
+        --u,--v;
         graph.entrar(u, v);
     }
-    graph.imprimir();
+    graph.imprimir_adjacencia();
+    graph.imprimir_matriz();
+    graph.imprimir_matriz_incidencia();
     graph.somatorio_vertices();
-    Graph graph2;
+    graph.classificao();
+    /*Graph graph2;
     cin>>vertex>>edge;
     graph2.build(vertex, edge);
     for(int j=0;j<edge;j++){
         int u,v;
         cin>>u>>v;
+        --u,--v;
         graph2.entrar(u, v);
     }
-    cout<<graph.invariantes_iso(graph2);
+    cout<<graph.invariantes_iso(graph2);*/
 }
