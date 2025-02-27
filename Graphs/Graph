@@ -4,10 +4,12 @@ struct Graph{
     int vertex, edges;
     vector<vector<int>> graph;
     vector<pair<int,int>> graph_edge;
+    vector<string> cor_no;
     void build(int n,int m){
         vertex = n;
         edges = m;
         graph.resize(n);
+        cor_no.resize(n, "Branco");
     }
     void entrar(int u,int v){
         graph[u].push_back(v);
@@ -86,35 +88,41 @@ struct Graph{
         cout<<"\nClassificao do grafo:\n";
         //Grafo completo
         bool verificacao=1;
-        for(int i=0;i<vertex;i++){
+        for(int i=0;i<vertex;i++)
             if(graph[i].size() != vertex-1)verificacao=0;
-        }
-        if(verificacao){
-            cout<<"Grafo Completo\n";
-        }
+        if(verificacao)cout<<"Grafo Completo\n";
+        
         //Grafo ciclo
         verificacao = 1;
-        for(int i=0;i<vertex;i++){
+        for(int i=0;i<vertex;i++)
             if(graph[i].size() != 2)verificacao=0;
-        }
-        if(verificacao){
-            cout<<"Grafo Ciclo\n";
-        }
+        if(verificacao)cout<<"Grafo Ciclo\n";
+        
+        //Grafo Roda
         int borda=0,centro=0;
-        for(int i=0;i<vertex;i++){
+        for(int i=0;i<vertex;i++)
             if(graph[i].size() == 3)borda++;
             else if(graph[i].size() == vertex-1)centro++;
-        }
-        if(centro == 1 && borda == vertex-1){
-            cout<<"Grafo Roda\n";
-        }
+        if(centro == 1 && borda == vertex-1)cout<<"Grafo Roda\n";
+
+        //Grafo Euleriano
         verificacao = 1;
+        for(int i=0;i<vertex;i++)
+            if(graph[i].size()&1)
+                verificacao=0;
+        if(verificacao)cout<<"Grafo Euleriano\n";
+        
+        //Grafo Bipartido
+        string cor = "Azul";
+        cor_no[0] = cor;
         for(int i=0;i<vertex;i++){
-            if(graph[i].size()&1)verificacao=0;
+            for(auto j : graph[i]){
+                if(cor_no[j] == cor_no[i]){
+                    return;
+                }else cor_no[j] = (cor_no[i] == "Vermelho" ? "Azul" : "Vermelho");
+            }
         }
-        if(verificacao){
-            cout<<"Grafo Euleriano\n";
-        }
+        cout<<"E Bipartido\n";
     }
     
 };
